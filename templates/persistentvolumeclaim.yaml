@@ -2,10 +2,10 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "nextcloud.fullname" . }}
+  name: {{ template "roundcube.fullname" . }}
   labels:
-    app: {{ template "nextcloud.name" . }}
-    chart: {{ template "nextcloud.chart" . }}
+    app: {{ template "roundcube.name" . }}
+    chart: {{ template "roundcube.chart" . }}
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
 spec:
