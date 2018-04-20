@@ -1,0 +1,76 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "roundcube.fullname" . }}
+  labels:
+    app: {{ template "roundcube.name" . }}
+    chart: {{ template "roundcube.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "roundcube.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "roundcube.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+{{ toYaml .Values.args | indent 12 }}
+          env:
+{{ toYaml .Values.env | indent 12 }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+# FIXME
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          volumeMounts:
+          - mountPath: /usr/local/share/ca-certificates
+            name: ca
+# TODO
+#          - mountPath: /var/roundcube/config
+#            name: data
+      volumes:
+      - name: ca
+        {{- if .Values.ca }}
+{{ toYaml .Values.ca | indent 8 }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: data
+      {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | default (include "roundcube.fullname" .) }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
