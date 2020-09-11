@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: roundcube/roundcubemail
-  tag: 1.3.6
+  tag: 1.4.8-apache
   pullPolicy: IfNotPresent
 
 args: [ sh, -c, 'update-ca-certificates && /docker-entrypoint.sh apache2-foreground' ]
@@ -72,3 +72,5 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+configs: {}
