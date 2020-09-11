@@ -45,9 +45,10 @@ spec:
           volumeMounts:
           - mountPath: /usr/local/share/ca-certificates
             name: ca
-# TODO
-#          - mountPath: /var/roundcube/config
-#            name: data
+{{- if .Values.configs -}}
+          - mountPath: /var/roundcube/config
+            name: config
+{{- end }}
       volumes:
       - name: ca
         {{- if .Values.ca }}
@@ -62,6 +63,10 @@ spec:
       {{- else }}
         emptyDir: {}
       {{- end }}
+{{- if .Values.configs -}}
+      - name: config
+        configMap: {{ template "roundcube.fullname" . }}-config
+{{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

@@ -1,0 +1,16 @@
+{{- if .Values.configs -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "roundcube.fullname" . }}-config
+  labels:
+    app.kubernetes.io/name: {{ include "roundcube.name" . }}
+    helm.sh/chart: {{ include "roundcube.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+{{- range $key, $value := .Values.configs }}
+  {{ $key }}: |-
+{{ $value | indent 4 }}
+{{- end }}
+{{- end }}
